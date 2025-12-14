@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment keys
+.env
+.env.local
+.env.*.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Project Data (Exclude database content)
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded Content (Exclude books and covers)
+uploads/
+
+# Binaries/Large files
+*.tar.gz
+*.zip
