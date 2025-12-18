@@ -15,6 +15,9 @@ if (!fs.existsSync(dataDir)) {
 const db = (global as any).db || new Database(dbPath);
 if (process.env.NODE_ENV !== 'production') (global as any).db = db;
 
+db.pragma('foreign_keys = ON');
+
+
 // Initialize schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS books (

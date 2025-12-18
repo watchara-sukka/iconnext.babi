@@ -23,7 +23,7 @@ interface Book {
 interface BookDetailModalProps {
     book: Book;
     onClose: () => void;
-    onUpdate?: () => void;
+    onUpdate?: (deletedId?: string) => void;
 }
 
 export default function BookDetailModal({ book: initialBook, onClose, onUpdate }: BookDetailModalProps) {
@@ -55,9 +55,10 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
 
             if (res.ok) {
                 onClose();
-                if (onUpdate) onUpdate();
+                if (onUpdate) onUpdate(book.id);
             } else {
-                alert('Failed to delete book');
+                const data = await res.json();
+                alert(data.error || 'Failed to delete book');
             }
         } catch (error) {
             console.error('Delete error:', error);

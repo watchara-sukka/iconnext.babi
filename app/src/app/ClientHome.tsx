@@ -19,12 +19,17 @@ export default function ClientHome({ books, totalPages, currentPage, currentQuer
     const [selectedBook, setSelectedBook] = useState<any>(null);
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
     const [searchQuery, setSearchQuery] = useState(currentQuery);
+    const [deletedBookIds, setDeletedBookIds] = useState<Set<string>>(new Set());
     const router = useRouter();
 
     // Update local search state if URL query changes (e.g. back button)
     useEffect(() => {
         setSearchQuery(currentQuery);
-    }, [currentQuery]);
+        setDeletedBookIds(new Set()); // Reset deleted list when navigating/searching
+    }, [currentQuery, currentPage, books]); // Reset when data likely changed
+
+    // Filter out deleted books
+    const visibleBooks = books.filter(b => !deletedBookIds.has(b.id));
 
     // Handle Search
     const handleSearch = (term: string) => {
@@ -75,8 +80,13 @@ export default function ClientHome({ books, totalPages, currentPage, currentQuer
                 <BookDetailModal
                     book={selectedBook}
                     onClose={() => setSelectedBook(null)}
-                    onUpdate={() => {
-                        router.refresh();
+                    onUpdate={(deletedId) => {
+                        if (deletedId) {
+                            // Optimistic update: Hide it immediately
+                            setDeletedBookIds(prev => new Set(prev).add(deletedId));
+                            setSelectedBook(null); // Close modal
+                        }
+                        router.refresh(); // Fetch real data in background
                     }}
                 />
             )}
@@ -125,12 +135,12 @@ export default function ClientHome({ books, totalPages, currentPage, currentQuer
                 <div className="flex-grow">
                     {viewMode === 'list' ? (
                         <ul role="list" className="divide-y divide-gray-200">
-                            {books.length === 0 ? (
+                            {visibleBooks.length === 0 ? (
                                 <li className="px-4 py-8 text-center text-gray-500">
                                     {currentQuery ? 'No books match your search.' : 'No books in the library yet. Import one above!'}
                                 </li>
                             ) : (
-                                books.map((book: any) => (
+                                visibleBooks.map((book: any) => (
                                     <li
                                         key={book.id}
                                         className="px-4 py-4 sm:px-6 hover:bg-gray-50 cursor-pointer transition-colors"
@@ -180,12 +190,12 @@ export default function ClientHome({ books, totalPages, currentPage, currentQuer
                         </ul>
                     ) : (
                         <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {books.length === 0 ? (
+                            {visibleBooks.length === 0 ? (
                                 <div className="col-span-full text-center py-8 text-gray-500">
                                     {currentQuery ? 'No books match your search.' : 'No books in the library yet. Import one above!'}
                                 </div>
                             ) : (
-                                books.map((book: any) => (
+                                visibleBooks.map((book: any) => (
                                     <div
                                         key={book.id}
                                         className="group relative flex flex-col cursor-pointer"

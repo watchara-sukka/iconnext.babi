@@ -15,22 +15,40 @@ export async function DELETE(
         const book = stmt.get(id) as any;
 
         if (!book) {
-            return NextResponse.json({ error: 'Book not found' }, { status: 404 });
+            // Idempotency: If book is already gone, consider it a success
+            return NextResponse.json({ success: true, message: 'Book already deleted' });
         }
 
         // 2. Delete files
-        // The folder path in DB is relative like 'uploads/UUID'
-        // We need absolute path
-        const uploadsDir = path.join(process.cwd(), '..', 'uploads');
-        const bookDir = path.join(uploadsDir, id);
+        // Use the folderPath stored in the database
+        const bookDir = path.join(process.cwd(), '..', book.folderPath);
 
-        if (fs.existsSync(bookDir)) {
-            fs.rmSync(bookDir, { recursive: true, force: true });
+        try {
+            if (fs.existsSync(bookDir)) {
+                fs.rmSync(bookDir, { recursive: true, force: true });
+                // console.log('[API] Check: File exists, would delete:', bookDir);
+            }
+        } catch (fsError) {
+            console.error('[API] File deletion warning:', fsError);
         }
 
         // 3. Delete from DB
-        const deleteStmt = db.prepare('DELETE FROM books WHERE id = ?');
-        deleteStmt.run(id);
+        console.log('[API] Deleting from DB...');
+        // Remove dependencies first (if foreign keys are not enabling cascade for some reason)
+        const delAuth = db.prepare('DELETE FROM book_authors WHERE book_id = ?');
+        const delBook = db.prepare('DELETE FROM books WHERE id = ?');
+
+        try {
+            delAuth.run(id);
+            delBook.run(id);
+            console.log('[API] DB deletion successful');
+        } catch (dbError) {
+            console.error('[API] DB Deletion failed:', dbError);
+            throw dbError;
+        }
+
+        // Give a small delay to ensure all operations settle
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         return NextResponse.json({ success: true });
     } catch (error) {
