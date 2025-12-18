@@ -30,6 +30,24 @@ export async function POST(req: NextRequest) {
         const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 50);
         const folderName = `${safeTitle}_${bookId.substring(0, 8)}`;
 
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+
+        // Calculate SHA-256 Hash
+        const crypto = require('crypto');
+        const hashSum = crypto.createHash('sha256');
+        hashSum.update(buffer);
+        const fileHash = hashSum.digest('hex');
+
+        // Check for duplicate file
+        const existingBook = db.prepare('SELECT id, title FROM books WHERE fileHash = ?').get(fileHash) as { id: string, title: string };
+
+        if (existingBook) {
+            return NextResponse.json({
+                error: `Duplicate file detected. This file already exists as "${existingBook.title}" (ID: ${existingBook.id})`
+            }, { status: 409 });
+        }
+
         const uploadDir = path.join(process.cwd(), '..', 'data', 'books', folderName);
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
@@ -38,22 +56,21 @@ export async function POST(req: NextRequest) {
         const safeFileName = `${bookId}${fileExt}`;
         const filePath = path.join(uploadDir, safeFileName);
 
-        const buffer = Buffer.from(await file.arrayBuffer());
         fs.writeFileSync(filePath, buffer);
 
         const relativeFolderPath = path.join('data', 'books', folderName);
 
         // Prepare statements
         const insertBook = db.prepare(`
-            INSERT INTO books (id, title, author, folderPath, fileName)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO books (id, title, author, folderPath, fileName, fileHash)
+            VALUES (?, ?, ?, ?, ?, ?)
         `);
         const insertAuthor = db.prepare('INSERT OR IGNORE INTO authors (name) VALUES (?)');
         const getAuthor = db.prepare('SELECT id FROM authors WHERE name = ?');
         const linkBookAuthor = db.prepare('INSERT OR IGNORE INTO book_authors (book_id, author_id) VALUES (?, ?)');
 
         const transaction = db.transaction(() => {
-            insertBook.run(bookId, title, author || 'Unknown', relativeFolderPath, safeFileName);
+            insertBook.run(bookId, title, author || 'Unknown', relativeFolderPath, safeFileName, fileHash);
 
             if (author) {
                 const authorNames = author.split(';').map(n => n.trim()).filter(n => n.length > 0);

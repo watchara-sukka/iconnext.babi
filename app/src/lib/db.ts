@@ -12,7 +12,8 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Database(dbPath);
+const db = (global as any).db || new Database(dbPath);
+if (process.env.NODE_ENV !== 'production') (global as any).db = db;
 
 // Initialize schema
 db.exec(`
@@ -31,8 +32,10 @@ db.exec(`
     publisher TEXT,
     year INTEGER,
     language TEXT,
+    language TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME
+    updatedAt DATETIME,
+    fileHash TEXT
   )
 `);
 
@@ -66,7 +69,8 @@ const columns = [
   { name: 'publisher', type: 'TEXT' },
   { name: 'year', type: 'INTEGER' },
   { name: 'language', type: 'TEXT' },
-  { name: 'updatedAt', type: 'DATETIME' }
+  { name: 'updatedAt', type: 'DATETIME' },
+  { name: 'fileHash', type: 'TEXT' }
 ];
 
 columns.forEach(col => {

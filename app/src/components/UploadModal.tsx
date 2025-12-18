@@ -198,11 +198,12 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
             if (res.ok) {
                 onUploadSuccess();
             } else {
-                alert('Upload failed');
+                const data = await res.json();
+                alert(data.error || 'Upload failed');
             }
         } catch (err) {
             console.error('Upload error:', err);
-            alert('Upload error');
+            alert('Upload error: ' + (err instanceof Error ? err.message : 'Unknown error'));
         } finally {
             setIsUploading(false);
         }
