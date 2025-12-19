@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import crypto from 'crypto';
 
 export async function GET() {
     try {
@@ -53,8 +54,23 @@ export async function POST(request: NextRequest) {
         }
 
         // Save book file with sanitized name (UUID + ext)
+        // Save book file with sanitized name (UUID + ext)
         const safeFileName = `${bookId}${fileExt}`;
         const buffer = Buffer.from(await file.arrayBuffer());
+
+        // Calculate Hash
+        const hashSum = crypto.createHash('sha256');
+        hashSum.update(buffer);
+        const fileHash = hashSum.digest('hex');
+
+        // Check for duplicate file
+        const existingBook = db.prepare('SELECT id, title FROM books WHERE fileHash = ?').get(fileHash) as { id: string, title: string };
+        if (existingBook) {
+            return NextResponse.json({
+                error: `Duplicate file detected. This file already exists as "${existingBook.title}"`
+            }, { status: 409 });
+        }
+
         const filePath = path.join(bookDir, safeFileName);
         await fs.promises.writeFile(filePath, buffer);
 
@@ -74,8 +90,8 @@ export async function POST(request: NextRequest) {
 
         // Save to Database
         const stmt = db.prepare(`
-            INSERT INTO books (id, title, author, description, category, isbn, folderPath, fileName, coverImage, fileSize, pageCount, publisher, year, language, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            INSERT INTO books (id, title, author, description, category, isbn, folderPath, fileName, coverImage, fileSize, pageCount, publisher, year, language, createdAt, fileHash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
         `);
 
         const insertAuthor = db.prepare('INSERT OR IGNORE INTO authors (name) VALUES (?)');
@@ -83,7 +99,7 @@ export async function POST(request: NextRequest) {
         const linkBookAuthor = db.prepare('INSERT OR IGNORE INTO book_authors (book_id, author_id) VALUES (?, ?)');
 
         const transaction = db.transaction(() => {
-            stmt.run(bookId, title, author, description, category, isbn, `uploads/${bookId}`, safeFileName, coverImageName, fileSize, pageCount, publisher, year, language);
+            stmt.run(bookId, title, author, description, category, isbn, `uploads/${bookId}`, safeFileName, coverImageName, fileSize, pageCount, publisher, year, language, fileHash);
 
             if (author) {
                 const authorNames = author.split(';').map(n => n.trim()).filter(n => n.length > 0);

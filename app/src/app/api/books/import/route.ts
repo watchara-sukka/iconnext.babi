@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: NextRequest) {
     try {
+        const logPath = '/workspaces/iconnext.babi/app/debug_upload.log';
+        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Handler Started\n`);
         const formData = await req.formData();
         const file = formData.get('file') as File;
         const title = formData.get('title') as string;
@@ -39,6 +41,10 @@ export async function POST(req: NextRequest) {
         hashSum.update(buffer);
         const fileHash = hashSum.digest('hex');
 
+        const fileHash = hashSum.digest('hex');
+
+        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Hash Calculated: ${fileHash}\n`);
+
         // Check for duplicate file
         const existingBook = db.prepare('SELECT id, title FROM books WHERE fileHash = ?').get(fileHash) as { id: string, title: string };
 
@@ -70,6 +76,7 @@ export async function POST(req: NextRequest) {
         const linkBookAuthor = db.prepare('INSERT OR IGNORE INTO book_authors (book_id, author_id) VALUES (?, ?)');
 
         const transaction = db.transaction(() => {
+            fs.appendFileSync(logPath, `[${new Date().toISOString()}] Inserting: ${bookId}, ${title}, ${fileHash}\n`);
             insertBook.run(bookId, title, author || 'Unknown', relativeFolderPath, safeFileName, fileHash);
 
             if (author) {

@@ -25,6 +25,7 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
     // Google Books Logic
     const [googleData, setGoogleData] = useState<any>(null);
     const [isSearchingGoogle, setIsSearchingGoogle] = useState(false);
+    const [duplicateWarning, setDuplicateWarning] = useState<{ title: string } | null>(null);
 
     const handleAskGoogle = async (e: React.MouseEvent) => {
         e.preventDefault(); // Prevent form submission
@@ -162,6 +163,28 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
             if (selectedFile.type === 'application/pdf') {
                 processPDF(selectedFile);
             }
+
+            // Check for duplicate
+            checkDuplicate(selectedFile);
+        }
+    };
+
+    const checkDuplicate = async (file: File) => {
+        setDuplicateWarning(null);
+        try {
+            const buffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            const res = await fetch(`/api/books/check-hash?hash=${hashHex}`);
+            const data = await res.json();
+
+            if (data.exists) {
+                setDuplicateWarning({ title: data.book.title });
+            }
+        } catch (error) {
+            console.error('Error checking duplicate:', error);
         }
     };
 
@@ -253,6 +276,23 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
                             </div>
                         )}
                     </div>
+
+                    {duplicateWarning && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-fadeIn">
+                            <div className="br-red-100 p-2 rounded-full text-red-600 bg-red-100">
+                                ⚠️
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-red-800">Duplicate File Detected</h4>
+                                <p className="text-sm text-red-700 mt-1">
+                                    This file is identical to an existing book in your library:
+                                </p>
+                                <div className="mt-2 bg-white/50 p-2 rounded border border-red-100 text-sm text-red-900 font-medium">
+                                    "{duplicateWarning.title}"
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         {googleData && (
