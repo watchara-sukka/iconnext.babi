@@ -9,8 +9,19 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+        // Cache Implementation
+        const cacheKey = `google_books_${query}`;
+        const cache = (global as any).googleBooksCache || new Map();
+        if (!(global as any).googleBooksCache) (global as any).googleBooksCache = cache;
+
+        if (cache.has(cacheKey)) {
+            console.log(`[API] Cache hit for "${query}"`);
+            return NextResponse.json(cache.get(cacheKey));
+        }
+
         const googleApiKey = process.env.GOOGLE_BOOKS_API_KEY || ''; // Optional: Use key if available
         const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1${googleApiKey ? `&key=${googleApiKey}` : ''}`;
+
 
         const response = await fetch(url);
 
@@ -42,6 +53,8 @@ export async function GET(request: NextRequest) {
             coverImage: volume.imageLinks?.thumbnail?.replace('http:', 'https:') || null
         };
 
+        // Store in cache
+        cache.set(cacheKey, result);
         return NextResponse.json(result);
 
     } catch (error: any) {

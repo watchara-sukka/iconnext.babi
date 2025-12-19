@@ -18,6 +18,7 @@ interface Book {
     year?: number;
     language?: string;
     updatedAt?: string;
+    fileHash?: string;
 }
 
 interface BookDetailModalProps {
@@ -31,6 +32,7 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isGeneratingHash, setIsGeneratingHash] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -164,7 +166,7 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                 onClick={e => e.stopPropagation()}
             >
                 {/* Left Side: Cover Image */}
-                <div className="w-full md:w-1/3 bg-gray-100 flex items-center justify-center p-6 md:p-8 relative">
+                <div className="w-full md:w-1/3 bg-gray-100 flex flex-col items-center justify-center p-6 md:p-8 relative">
                     <div className="aspect-[2/3] w-full max-w-[240px] shadow-xl rounded-lg overflow-hidden relative group">
                         {book.coverImage ? (
                             <img
@@ -176,6 +178,43 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center text-6xl">
                                 📚
                             </div>
+                        )}
+                    </div>
+
+                    {/* File Hash Section */}
+                    <div className="mt-4 w-full px-4">
+                        {book.fileHash ? (
+                            <div className="text-xs text-gray-500 bg-white p-2 rounded border border-gray-200 break-all text-center">
+                                <p className="font-semibold mb-1">File Hash (SHA-256)</p>
+                                {book.fileHash}
+                            </div>
+                        ) : (
+                            <button
+                                onClick={async () => {
+                                    if (isGeneratingHash) return;
+                                    setIsGeneratingHash(true);
+                                    try {
+                                        const res = await fetch(`/api/books/${book.id}/hash`, { method: 'POST' });
+                                        const data = await res.json();
+                                        if (res.ok) {
+                                            setBook(prev => ({ ...prev, fileHash: data.fileHash }));
+                                            if (onUpdate) onUpdate(); // Refresh parent to save state if needed
+                                        } else {
+                                            alert(data.error || 'Failed to generate hash');
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert('Error generating hash');
+                                    } finally {
+                                        setIsGeneratingHash(false);
+                                    }
+                                }}
+                                disabled={isGeneratingHash}
+                                className="w-full py-2 bg-gray-600 hover:bg-gray-700 text-white text-xs font-semibold rounded shadow transition-colors flex items-center justify-center gap-2"
+                            >
+                                {isGeneratingHash ? <span className="animate-spin">⌛</span> : <Hash className="w-3 h-3" />}
+                                Generate Hash
+                            </button>
                         )}
                     </div>
                 </div>
