@@ -1,11 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    webpack: (config) => {
-        config.externals.push('better-sqlite3');
+    webpack: (config, { isServer }) => {
         config.resolve.alias.canvas = false;
+
+        // For sql.js WASM support
+        if (isServer) {
+            config.externals.push('sql.js');
+        }
+
         return config;
     },
-    transpilePackages: [], // Added transpilePackages as an empty array, as no specific packages were provided in the instruction.
+    transpilePackages: [],
+    experimental: {
+        serverComponentsExternalPackages: ['sql.js']
+    }
 }
 
 module.exports = nextConfig

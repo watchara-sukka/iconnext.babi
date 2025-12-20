@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, BookOpen, Calendar, Tag, Hash, Trash2, Edit, Save, Check } from 'lucide-react';
+import { X, BookOpen, Calendar, Tag, Hash, Trash2, Edit, Save, Check, HelpCircle } from 'lucide-react';
 
 interface Book {
     id: string;
@@ -162,12 +162,20 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
             <div
-                className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row overflow-hidden"
+                className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row overflow-hidden relative"
                 onClick={e => e.stopPropagation()}
             >
+                {/* Close Button - Sticky/Floating for better mobile access */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-20 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm md:bg-transparent md:shadow-none text-gray-400 hover:text-gray-600 transition-all"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+
                 {/* Left Side: Cover Image */}
                 <div className="w-full md:w-1/3 bg-gray-100 flex flex-col items-center justify-center p-6 md:p-8 relative">
-                    <div className="aspect-[2/3] w-full max-w-[240px] shadow-xl rounded-lg overflow-hidden relative group">
+                    <div className="aspect-[2/3] w-full max-w-[180px] md:max-w-[240px] shadow-xl rounded-lg overflow-hidden relative group">
                         {book.coverImage ? (
                             <img
                                 src={`/api/books/${book.id}/cover?t=${Date.now()}`} // Cache bust
@@ -222,7 +230,8 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                 {/* Right Side: Details */}
                 <div className="w-full md:w-2/3 p-6 md:p-8 flex flex-col relative">
                     {/* Action Buttons */}
-                    <div className="absolute top-4 right-4 flex gap-2">
+                    {/* Action Buttons */}
+                    <div className="absolute top-4 right-4 flex gap-2 pr-8 md:pr-0">
                         {!isEditing && (
                             <>
                                 <button
@@ -242,12 +251,6 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                                 </button>
                             </>
                         )}
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all ml-2 border-l border-gray-200 pl-4"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
                     </div>
 
                     {isEditing ? (
@@ -266,6 +269,19 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                                     )}
                                     Ask Google
                                 </button>
+                                <div className="group relative ml-2">
+                                    <HelpCircle className="w-5 h-5 text-gray-400 hover:text-indigo-600 cursor-help transition-colors" />
+                                    <div className="absolute right-0 top-full mt-2 w-64 p-3 bg-white border border-gray-200 text-xs text-gray-600 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                        <p className="font-semibold mb-1 text-gray-900">ลำดับการค้นหา:</p>
+                                        <ol className="list-decimal list-inside space-y-0.5 mb-2">
+                                            <li><span className="text-indigo-600">ISBN</span> (ถ้ามี)</li>
+                                            <li><span className="text-indigo-600">ชื่อหนังสือ</span> (ถ้าไม่มี ISBN)</li>
+                                        </ol>
+                                        <p className="text-gray-500 border-t border-gray-100 pt-1 mt-1">
+                                            💡 <span className="italic">แนะนำ: ลบ ISBN ออกเพื่อค้นหาด้วยชื่อหนังสืออย่างเดียว</span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             {googleData && (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, UploadCloud, FileUp, Search } from 'lucide-react';
+import { X, UploadCloud, FileUp, Search, HelpCircle } from 'lucide-react';
 
 interface UploadModalProps {
     onClose: () => void;
@@ -37,9 +37,11 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
 
         setIsSearchingGoogle(true);
         setGoogleData(null);
+        console.log('[UploadModal] Asking Google for:', query);
         try {
             const res = await fetch(`/api/external/google-books?query=${encodeURIComponent(query)}`);
             const data = await res.json();
+            console.log('[UploadModal] Google Data:', data);
 
             if (data.found) {
                 setGoogleData(data);
@@ -321,15 +323,30 @@ export default function UploadModal({ onClose, onUploadSuccess }: UploadModalPro
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <label className="block text-sm font-medium text-slate-400">Title</label>
-                                <button
-                                    onClick={handleAskGoogle}
-                                    disabled={isSearchingGoogle}
-                                    className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                                    type="button"
-                                >
-                                    {isSearchingGoogle ? <span className="animate-spin">⌛</span> : <Search className="w-3.5 h-3.5" />}
-                                    Ask Google
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleAskGoogle}
+                                        disabled={isSearchingGoogle}
+                                        className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                                        type="button"
+                                    >
+                                        {isSearchingGoogle ? <span className="animate-spin">⌛</span> : <Search className="w-3.5 h-3.5" />}
+                                        Ask Google
+                                    </button>
+                                    <div className="group relative">
+                                        <HelpCircle className="w-4 h-4 text-slate-500 hover:text-slate-300 cursor-help transition-colors" />
+                                        <div className="absolute right-0 bottom-full mb-2 w-64 p-3 bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                            <p className="font-semibold mb-1 text-white">ลำดับการค้นหา:</p>
+                                            <ol className="list-decimal list-inside space-y-0.5 mb-2">
+                                                <li><span className="text-indigo-400">ISBN</span> (ถ้ามี)</li>
+                                                <li><span className="text-indigo-400">ชื่อหนังสือ</span> (ถ้าไม่มี ISBN)</li>
+                                            </ol>
+                                            <p className="text-slate-400 border-t border-slate-700 pt-1 mt-1">
+                                                💡 <span className="italic">แนะนำ: ลบ ISBN ออกเพื่อค้นหาด้วยชื่อหนังสืออย่างเดียว</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <input
                                 type="text"

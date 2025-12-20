@@ -41,8 +41,6 @@ export async function POST(req: NextRequest) {
         hashSum.update(buffer);
         const fileHash = hashSum.digest('hex');
 
-        const fileHash = hashSum.digest('hex');
-
         fs.appendFileSync(logPath, `[${new Date().toISOString()}] Hash Calculated: ${fileHash}\n`);
 
         // Check for duplicate file

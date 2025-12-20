@@ -189,7 +189,7 @@ export default function ClientHome({ books, totalPages, currentPage, currentQuer
                             )}
                         </ul>
                     ) : (
-                        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                             {visibleBooks.length === 0 ? (
                                 <div className="col-span-full text-center py-8 text-gray-500">
                                     {currentQuery ? 'No books match your search.' : 'No books in the library yet. Import one above!'}
