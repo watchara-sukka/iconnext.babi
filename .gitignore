@@ -34,3 +34,4 @@ uploads/
 # Binaries/Large files
 *.tar.gz
 *.zip
+bin/
