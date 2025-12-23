@@ -71,19 +71,42 @@ npm run dev
 
 ## โครงสร้างโปรเจกต์
 
-```
 /workspaces/iconnext.babi/
-├── app/                  # แอปพลิเคชัน Next.js หลัก
+├── app/                  # แอปพลิเคชัน Next.js (Source Code)
 │   ├── src/
 │   │   ├── app/          # หน้าเว็บ App router และ API routes
 │   │   ├── components/   # React components
-│   │   └── lib/          # Utilities (เช่น การเชื่อมต่อฐานข้อมูล)
-│   ├── public/           # ไฟล์ Static assets
+│   │   └── lib/          # Utilities
+│   ├── public/           # ไฟล์ Static assets (รูปภาพประกอบ)
 │   └── ...config files
-├── data/                 # ไฟล์หนังสือที่ถูกจัดเก็บ (อยู่นอก app/ เพื่อให้คงอยู่แม้จะ build ใหม่)
-├── start.sh              # สคริปต์สำหรับเริ่มทำงานบน Linux
-└── ...
+├── data/                 # ฐานข้อมูล SQLite (dev mode)
+├── uploads/              # โฟลเดอร์เก็บไฟล์หนังสือ (dev mode)
+├── bin/                  # Node.js Portable runtimes (เก็บไฟล์ .exe/.bin ของ nodejs)
+├── deploy.sh             # สคริปต์สำหรับ Build และ Deploy ลง USB
+├── start_mac.sh          # สคริปต์เริ่มงานบน Mac
+└── start_win.bat         # สคริปต์เริ่มงานบน Windows
 ```
+
+### โครงสร้างไฟล์เมื่อ Deploy ลง USB
+
+เมื่อรัน `deploy.sh` ระบบจะจัดเตรียมไฟล์ลง USB โดยมีโครงสร้างดังนี้ (เหมาะสำหรับการพกพา):
+
+```
+[USB_DRIVE_ROOT]/
+├── app/                  # Standalone App (ไฟล์ที่ Compiled แล้ว)
+│   ├── .next/            # Next.js Build files
+│   ├── public/           # Static assets
+│   └── server.js         # Entry point สำหรับรัน server
+├── bin/                  # Node.js Portable runtimes (ก๊อปปี้มาจาก Dev)
+│   ├── mac/
+│   └── win/
+├── data/                 # ฐานข้อมูล SQLite (Production)
+├── uploads/              # ไฟล์หนังสือทั้งหมด (PDF/EPUB)
+├── start_mac.sh          # ตัวเปิดโปรแกรม (Mac)
+└── start_win.bat         # ตัวเปิดโปรแกรม (Windows)
+```
+
+> **ความแตกต่างสำคัญ**: ตัวที่อยู่บน USB จะเป็น "Standalone Build" ซึ่งมีขนาดเล็กกว่าและไม่ต้องใช้ `node_modules` ขนาดใหญ่เหมือนตอน Dev ทำให้ประหยัดเนื้อที่และทำงานได้เร็วกว่าบน Flash Drive
 
 ## การแก้ไขฟีเจอร์
 
@@ -119,76 +142,22 @@ npm start
 
 ## การติดตั้งและอัปเดตบน Removable Storage (USB/External Drive)
 
-ส่วนนี้สำหรับผู้ดูแลระบบที่ต้องการติดตั้ง Babi E-book Portal ลงในอุปกรณ์พกพาเพื่อให้สามารถนำไปใช้งานได้ทันที
+สำหรับผู้ดูแลระบบที่ต้องการติดตั้ง Babi E-book Portal ลงในอุปกรณ์พกพา:
 
-### 1. การติดตั้งครั้งแรก (First-time Installation)
+**วิธีที่แนะนำ (รวดเร็วที่สุด):**
 
-สำหรับอุปกรณ์ที่ยังไม่เคยติดตั้งระบบมาก่อน:
+เราได้เตรียมสคริปต์ `deploy.sh` ไว้ให้แล้ว ซึ่งจะทำการ Build โปรเจกต์แบบ Standalone และคัดลอกไฟล์ไปยัง USB ให้โดยอัตโนมัติ
 
-1.  **เตรียม Source Code (เครื่อง Developer)**
-    - เปิด Terminal และเข้าไปที่โฟลเดอร์ `app`
-    - รันคำสั่งติดตั้ง dependencies และ build โปรเจกต์:
-      ```bash
-      npm install
-      npm run build
-      ```
-
-2.  **เตรียมพื้นที่จัดเก็บ (Removable Storage)**
-    - สร้างโฟลเดอร์หลักบนอุปกรณ์ USB ของคุณ เช่น `BabiLibrary`
-
-3.  **คัดลอกไฟล์ไปยังอุปกรณ์**
-    คัดลอกไฟล์และโฟลเดอร์จากเครื่อง Developer ไปยังโฟลเดอร์ `BabiLibrary` บน USB ดังนี้:
-    
-    *ในโฟลเดอร์ `app/`:*
-    - `.next` (โฟลเดอร์ที่ได้จากการ build)
-    - `node_modules` (ไลบรารีต่างๆ)
-    - `public` (ไฟล์รูปภาพและ assets)
-    - `package.json`
-    - `next.config.js`
-    
-    *นอกโฟลเดอร์ `app/`:*
-    - `data` (สร้างโฟลเดอร์เปล่าไว้สำหรับเก็บหนังสือ)
-
-    **โครงสร้างไฟล์บน USB ควรเป็นดังนี้:**
+1.  **เสียบ USB** เข้ากับเครื่องคอมพิวเตอร์ (MacOS/Linux)
+2.  **รันคำสั่ง**:
+    ```bash
+    # รูปแบบ: ./deploy.sh [PATH_TO_USB]
+    ./deploy.sh /Volumes/MyUSB
     ```
-    BabiLibrary/
-    ├── app/
-    │   ├── .next/
-    │   ├── node_modules/
-    │   ├── public/
-    │   ├── package.json
-    │   └── next.config.js
-    └── data/
-    ```
+3.  **รอจนเสร็จ**: สคริปต์จะทำการ:
+    - Build Next.js แบบ Standalone (ไฟล์เล็กลงมาก)
+    - สร้างโครงสร้างโฟลเดอร์บน USB (`app/`, `data/`, `uploads/`, `bin/`)
+    - คัดลอกไฟล์ที่จำเป็นทั้งหมด
+    - ใช้ `rsync` เพื่ออัปเดตเฉพาะไฟล์ที่เปลี่ยนแปลง (รวดเร็วในการอัปเดตครั้งต่อไป)
 
-    > **หมายเหตุสำคัญ (Cross-Platform)**: เนื่องจากโปรเจกต์ใช้ `better-sqlite3` ซึ่งเป็น Native Module หากคุณ Build บนเครื่อง Linux แต่จะนำไปรันบน Windows (หรือกลับกัน) คุณอาจจำเป็นต้องรัน `npm rebuild better-sqlite3` หรือ `npm install` อีกครั้งบนเครื่องปลายทางเพื่อให้ทำงานได้ถูกต้อง
-
-4.  **การใช้งาน**
-    - เสียบ USB เข้ากับคอมพิวเตอร์
-    - เปิด Terminal/Command Prompt เข้าไปที่ `BabiLibrary/app` บน USB
-    - รันคำสั่ง `npm start`
-
----
-
-### 2. การอัปเดตตัวจัดการ (Updating the Manager)
-
-สำหรับกรณีที่มีการแก้ไขบั๊กหรือเพิ่มฟีเจอร์ใหม่ และต้องการอัปเดตลงใน USB เดิม (โดยไม่กระทบข้อมูลหนังสือ):
-
-1.  **Build เวอร์ชันใหม่ (เครื่อง Developer)**
-    - ทำการแก้ไขและทดสอบ Code ให้เรียบร้อย
-    - รันคำสั่ง build ใหม่:
-      ```bash
-      cd app
-      npm run build
-      ```
-
-2.  **อัปเดตไฟล์บนอุปกรณ์ (Removable Storage)**
-    นำ USB มาเสียบที่เครื่อง Developer และดำเนินการดังนี้:
-    
-    1. เข้าไปที่โฟลเดอร์ `app` บน USB
-    2. **ลบ** โฟลเดอร์ `.next` ของเดิมทิ้ง
-    3. **คัดลอก** โฟลเดอร์ `.next` ที่เพิ่ง build ใหม่จากเครื่อง Developer ไปวางแทนที่บน USB
-    4. (หากมีการแก้หน้าตาเว็บ/รูปภาพ) ให้คัดลอกโฟลเดอร์ `public` ไปทับของเดิม
-    5. (หากมีการเพิ่มไลบรารีใหม่) ให้คัดลอก `package.json` ไปทับ และอาจต้อง copy `node_modules` ใหม่ไปด้วย
-
-    > **คำเตือน**: ห้ามลบโฟลเดอร์ `data/` บน USB เด็ดขาด! เพราะเป็นที่เก็บไฟล์หนังสือทั้งหมด
+> **หมายเหตุสำคัญ (Cross-Platform)**: เนื่องจากโปรเจกต์ใช้ `better-sqlite3` ซึ่งเป็น Native Module หากคุณ Build บนเครื่อง Linux/Mac และนำไปรันบน Windows (หรือกลับกัน) อาจเกิดปัญหาในการโหลด Module ได้ ในกรณีนี้แนะนำให้ใช้วิธีนำ Source Code ไป Build บนเครื่องปลายทาง หรือใช้ `npm rebuild` บนเครื่องปลายทาง

@@ -1,0 +1,25 @@
+# Project Rules & Context
+
+## 1. Core Philosophy: Portable First
+This project is designed to run from a **USB Flash Drive**. 
+- **Constraint**: IO speeds on USB are slow. Random read/write is expensive.
+- **Constraint**: The user might move this folder to any computer (School, Office, Home).
+- **Goal**: "Plug & Play". No complex installation on the host machine.
+
+## 2. Technical Constraints
+### Deployment
+- **ALWAYS** use `output: 'standalone'` for Next.js builds.
+- **NEVER** suggest copying the full `node_modules` folder for deployment. It contains too many small files.
+- Prefers single-file executables or minimal file counts where possible.
+
+### Runtime
+- The system should run via the provided `start.bat` or `start.sh`.
+- Do not rely on global npm packages (like `pm2` or `vercel`) unless they are bundled locally.
+
+## 3. Database
+- SQLite is used because it is serverless and file-based.
+- Ensure the DB file (`data/babi.db`) is stored *outside* the `.next` build folder so it survives updates.
+
+## 4. User Experience
+- The app must handle "Cold Starts" gracefully.
+- Offline support is crucial (no guaranteed internet on host machines).

@@ -107,11 +107,14 @@ iconnext.babi/
 3.  รันคำสั่ง `npm run dev` เพื่อเริ่มเซิร์ฟเวอร์ที่ `http://localhost:3000`
 
 ### 5.2 การ Build เพื่อพกพา/ใช้งานจริง (Portable/Production)
-1.  รันคำสั่ง `npm run build` ในโฟลเดอร์ `app/`
+### 5.2 การ Build เพื่อพกพา/ใช้งานจริง (Portable/Production - เร็วและเล็กกว่าเดิม)
+1.  รันคำสั่ง `npm run build` ในโฟลเดอร์ `app/` (ระบบจะสร้างโฟลเดอร์ `.next/standalone` อัตโนมัติ)
 2.  **สำหรับการติดตั้งลง USB**:
-    - คัดลอก `.next`, `node_modules`, `public`, `package.json`, `next.config.js` ไปยังโฟลเดอร์ `app/` บน USB
+    - คัดลอกไฟล์ทั้งหมดจาก **`.next/standalone`** ไปยังโฟลเดอร์ `app/` บน USB (ขั้นตอนนี้จะเร็วกว่าเดิมมาก เพราะไม่ต้องก๊อปปี้ `node_modules` ทั้งหมด)
+    - คัดลอกโฟลเดอร์ **`.next/static`** ไปวางที่ `app/.next/static` บน USB
+    - คัดลอกโฟลเดอร์ **`public`** ไปวางที่ `app/public` บน USB
     - ตรวจสอบให้แน่ใจว่ามีโฟลเดอร์ `data/` อยู่ที่ root ของ USB (ระดับเดียวกับ `app/`)
-    - ใช้ไฟล์ `start.bat` (Windows) หรือ `start.sh` (Mac/Linux) เพื่อเปิดใช้งาน
+    - ในการรันโปรแกรม ให้ใช้คำสั่ง `node server.js` (หรือแก้ไขไฟล์ start.bat/sh ให้เรียกคำสั่งนี้แทน `npm start`)
 
 ## 6. แผนงานในอนาคต (Future Roadmap)
 - [ ] พัฒนาด้วย Tuari (Rust) เพื่อประสบการณ์การใช้งานแบบ Desktop App ที่สมบูรณ์

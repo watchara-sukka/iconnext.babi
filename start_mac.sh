@@ -4,8 +4,8 @@ cd "$(dirname "$0")"
 echo "Starting Babi Portal..."
 
 # Check for portable node
-if [ -f "bin/mac/node" ]; then
-    export PATH="$(pwd)/bin/mac:$PATH"
+if [ -f "bin/mac/bin/node" ]; then
+    export PATH="$(pwd)/bin/mac/bin:$PATH"
     echo "Using portable Node.js."
 else
     echo "Portable Node.js not found. Using system Node.js."
