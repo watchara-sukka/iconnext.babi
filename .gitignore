@@ -6,6 +6,10 @@ node_modules/
 out/
 build/
 dist/
+dist-electron/
+dist-electron-vite/
+release-electron/
+.last_build_hash
 
 # Logs
 *.log

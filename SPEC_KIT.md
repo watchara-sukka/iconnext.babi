@@ -8,37 +8,47 @@
 ## 2. ข้อมูลจำเพาะทางเทคนิค
 
 ### 2.1 เทคโนโลยีที่ใช้ (Technology Stack)
-- **Framework**: Next.js 13.4.12 (App Router)
-- **Language**: TypeScript 5.1.6
-- **UI Library**: React 18.2.0
-- **Styling**: TailwindCSS 3.3.3
-- **Database**: SQLite (ผ่าน `sql.js` และ `better-sqlite3` เพื่อประสิทธิภาพแบบ Native)
-- **PDF Processing**: `pdf-lib`, `pdfjs-dist`
+- **Runtime**: Electron 39.2.7
+- **Bundler**: Vite 6.0.0
+- **Frontend Framework**: React 19.2.0
+- **Language**: TypeScript 5.9.3
+- **Styling**: TailwindCSS 4.1.18
+- **Database**: SQLite (ผ่าน `sql.js` สำหรับ Browser environment ใน Electron)
+- **PDF Processing**: `pdfjs-dist`
 - **Icons**: `lucide-react`
 
 ### 2.2 สภาพแวดล้อม (Environment)
-- **Runtime**: Node.js 18+
-- **Platform**: รองรับ Cross-platform (Windows, macOS, Linux) ผ่านสคริปต์ติดตั้งแบบพกพา
+- **Platform**: รองรับ Cross-platform (Windows, macOS, Linux)
 - **Portability**: ออกแบบมาให้มีทุกอย่างครบจบในโฟลเดอร์เดียว (Self-contained) รองรับฟังก์ชัน "Plug & Play" บน USB drive
+- **Data Persistence**: เก็บฐานข้อมูลและไฟล์แนบไว้ในโฟลเดอร์ `data` และ `uploads` ที่อยู่ระดับเดียวกันกับตัวแอปพลิเคชัน (Portable Mode)
 
 ## 3. สถาปัตยกรรมระบบ
 
-### 3.1 โครงสร้างไดเรกทอรี
+### 3.1 โครงสร้างไดเรกทอรี (สำหรับนักพัฒนา)
 ```
 iconnext.babi/
-├── app/                  # แอปพลิเคชัน Next.js หลัก
-│   ├── src/
-│   │   ├── app/          # App Router และ API Routes
-│   │   ├── components/   # UI Components ที่นำกลับมาใช้ซ้ำได้
-│   │   └── lib/          # Utilities และ Logic ฐานข้อมูล
-│   ├── public/           # ไฟล์ Static Assets
+├── app-vite/             # แอปพลิเคชัน Electron + Vite หลัก
+│   ├── src/              # React Frontend Source
+│   ├── electron/         # Electron Main Process & Preload
+│   ├── public/           # Static Assets
 │   └── package.json      # Dependencies และ Scripts
-├── data/                 # ชั้นข้อมูล (Data Persistence Layer)
-│   ├── babi.db           # ไฟล์ฐานข้อมูล SQLite
-│   └── books/            # ไฟล์ E-book ที่จัดเก็บไว้ (PDF/EPUB)
-├── start.sh              # สคริปต์เริ่มทำงานสำหรับ Linux/Mac
-├── start.bat             # สคริปต์เริ่มทำงานสำหรับ Windows
+├── data/                 # ชั้นข้อมูล (Data Persistence Layer) - Portable babi.db
+├── uploads/              # ที่เก็บไฟล์หนังสือ (Portable Storage)
+├── scripts/              # สคริปต์สำหรับช่วย Build / Sync / Packaging
 └── README.md             # เอกสารทั่วไป
+```
+
+### 3.2 โครงสร้างไดเรกทอรี (USB Version - Deployment)
+เมื่อ Build และวางบน USB แล้ว โครงสร้างจะเป็นดังนี้:
+```
+[USB Drive Root]/
+├── data/                 # ฐานข้อมูล SQLite (ใช้งานร่วมกันทุก Platform)
+│   └── babi.db
+├── uploads/              # ที่เก็บไฟล์หนังสือและรูปปก
+├── Windows/              # ตัวโปรแกรมสำหรับ Windows (win-unpacked)
+│   └── Babi E-book Portal.exe
+└── Mac/                  # ตัวโปรแกรมสำหรับ macOS (.app bundle)
+    └── Babi E-book Portal.app
 ```
 
 ### 3.2 โครงสร้างฐานข้อมูล (Database Schema)
@@ -92,7 +102,9 @@ iconnext.babi/
 4.  **ดึงข้อมูล Metadata**:
     - ดึงข้อมูลพื้นฐาน (ชื่อไฟล์, ขนาด)
     - ฟีเจอร์ "Ask Google" เรียก Google Books API โดยใช้ชื่อเรื่อง/ISBN เพื่อดึงข้อมูลเพิ่มเติม
-5.  **จัดเก็บ**: บันทึกไฟล์ลงใน `data/books/<uuid>/`
+5.  **จัดเก็บ**: บันทึกไฟล์ลงใน `uploads/<uuid>/`
+    - ไฟล์หนังสือ: `uploads/<uuid>/<fileName>.pdf`
+    - ไฟล์ปก: `uploads/<uuid>/cover.jpg`
 6.  **บันทึกฐานข้อมูล**: เพิ่มข้อมูลลงในตาราง `books` และเชื่อมโยงกับ `authors`
 
 ### 4.2 การค้นหาและเรียกดู (Search & Discovery)

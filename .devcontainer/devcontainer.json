@@ -1,5 +1,5 @@
 {
-	"name": "me.babi",
+	"name": "me_babi-ebook-portal",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
