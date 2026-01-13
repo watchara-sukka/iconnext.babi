@@ -117,12 +117,39 @@ export const setupMockApi = () => {
             await new Promise(resolve => setTimeout(resolve, 500));
             return { success: true };
         },
+        onUpdateChecking: (callback: () => void) => {
+            console.log('[Mock] onUpdateChecking registered');
+            return () => { };
+        },
         onUpdateAvailable: (callback: (info: any) => void) => {
             console.log('[Mock] onUpdateAvailable registered');
             // Simulate an update after 30 seconds
-            setTimeout(() => {
+            const timer = setTimeout(() => {
                 callback({ version: '1.0.0', releaseNotes: 'New features available!' });
             }, 30000);
+            return () => clearTimeout(timer);
+        },
+        onUpdateNotAvailable: (callback: () => void) => {
+            console.log('[Mock] onUpdateNotAvailable registered');
+            return () => { };
+        },
+        onUpdateProgress: (callback: (progress: any) => void) => {
+            console.log('[Mock] onUpdateProgress registered');
+            return () => { };
+        },
+        onUpdateDownloaded: (callback: (info: any) => void) => {
+            console.log('[Mock] onUpdateDownloaded registered');
+            return () => { };
+        },
+        onUpdateError: (callback: (message: string) => void) => {
+            console.log('[Mock] onUpdateError registered');
+            return () => { };
+        },
+        downloadUpdate: () => {
+            console.log('[Mock] downloadUpdate');
+        },
+        quitAndInstall: () => {
+            console.log('[Mock] quitAndInstall');
         },
         openReleasePage: () => {
             console.log('[Mock] openReleasePage');
