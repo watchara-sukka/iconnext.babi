@@ -69,6 +69,9 @@
       "!**/node_modules/.bin",
       "!**/*.map"
     ],
+    "extraResources": [
+      "app-update.yml"
+    ],
     "asar": true,
     "npmRebuild": false,
     "asarUnpack": [

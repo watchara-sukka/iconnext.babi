@@ -1,0 +1,4 @@
+provider: github
+owner: watchara-sukka
+repo: iconnext.babi
+updaterCacheDirName: babi-ebook-portal-updater
