@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, BookOpen, Calendar, Tag, Hash, Trash2, Edit, Search } from 'lucide-react';
+import { X, BookOpen, Calendar, Tag, Hash, Trash2, Edit, Search, HelpCircle } from 'lucide-react';
 
 interface Book {
     id: string;
@@ -95,8 +95,14 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
     const [isSearchingGoogle, setIsSearchingGoogle] = useState(false);
 
     const handleAskGoogle = async () => {
-        const query = formData.isbn || formData.title;
-        if (!query || query.trim() === '') {
+        // Send structured data for smarter search
+        const queryData = {
+            isbn: formData.isbn,
+            title: formData.title,
+            author: formData.author
+        };
+
+        if ((!queryData.isbn || queryData.isbn.trim() === '') && (!queryData.title || queryData.title.trim() === '')) {
             alert('กรุณาระบุชื่อเรื่องหรือ ISBN เพื่อค้นหา');
             return;
         }
@@ -104,7 +110,7 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
         setIsSearchingGoogle(true);
         setGoogleData(null);
         try {
-            const data = await window.api.searchGoogle(query);
+            const data = await window.api.searchGoogle(queryData);
 
             if (data.found) {
                 setGoogleData(data);
@@ -195,6 +201,21 @@ export default function BookDetailModal({ book: initialBook, onClose, onUpdate }
                                 <button onClick={handleAskGoogle} disabled={isSearchingGoogle} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg hover:bg-indigo-500/20 transition-colors text-xs font-semibold border border-indigo-500/20">
                                     {isSearchingGoogle ? <span className="animate-spin text-sm">⌛</span> : <Search className="w-3.5 h-3.5" />} ถาม Google
                                 </button>
+                                {/* Search Hint Tooltip */}
+                                <div className="relative group/hint ml-2 cursor-help">
+                                    <HelpCircle className="w-4 h-4 text-slate-500 hover:text-indigo-400 transition-colors" />
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-xl text-xs text-slate-300 opacity-0 group-hover/hint:opacity-100 pointer-events-none transition-all duration-200 z-50 translate-y-2 group-hover/hint:translate-y-0 shadow-indigo-500/10 backdrop-blur-sm">
+                                        <div className="font-bold text-indigo-400 mb-1.5 flex items-center gap-1.5">
+                                            <Search className="w-3 h-3" /> ขั้นตอนการค้นหา:
+                                        </div>
+                                        <ol className="list-decimal list-inside space-y-1 text-slate-400">
+                                            <li>ค้นหาด้วย <span className="text-white font-medium">ISBN</span> (ระบบตัดขีดออกให้)</li>
+                                            <li>ถ้าไม่เจอ: <span className="text-white font-medium">ชื่อเรื่อง + ผู้แต่ง</span></li>
+                                            <li>สุดท้าย: <span className="text-white font-medium">ชื่อเรื่อง</span> อย่างเดียว</li>
+                                        </ol>
+                                        <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-slate-900 border-b border-r border-slate-700 transform rotate-45"></div>
+                                    </div>
+                                </div>
                             </div>
 
                             {googleData && (

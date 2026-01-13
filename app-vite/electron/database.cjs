@@ -292,40 +292,78 @@ function handleDatabaseIpc(ipcMain) {
     });
 
     // GOOGLE BOOKS SEARCH
-    ipcMain.handle('books:searchGoogle', async (event, query) => {
+    ipcMain.handle('books:searchGoogle', async (event, queryInput) => {
         try {
-            console.log('Searching Google Books for:', query);
+            console.log('Searching Google Books for input:', queryInput);
+
             if (typeof fetch === 'undefined') {
                 console.error('FETCH IS UNDEFINED in Main Process');
                 throw new Error('fetch is not defined in this Node environment');
             }
-            const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`);
-            console.log('Google Books response status:', res.status);
-            if (!res.ok) {
-                throw new Error(`Google Books API failed: ${res.status} ${res.statusText}`);
+
+            let queries = [];
+
+            // Handle input: can be string (old way) or object {isbn, title, author}
+            if (typeof queryInput === 'string') {
+                queries.push(queryInput);
+            } else {
+                const { isbn, title, author } = queryInput;
+
+                // Priority 1: ISBN (Cleaned)
+                if (isbn) {
+                    const cleanIsbn = isbn.replace(/-/g, '').trim();
+                    if (cleanIsbn) queries.push(`isbn:${cleanIsbn}`);
+                }
+
+                // Priority 2: Title + Author
+                if (title) {
+                    let q = `intitle:${title}`;
+                    if (author) q += `+inauthor:${author}`;
+                    queries.push(q);
+                }
+
+                // Priority 3: Just Title (if author is missing or search failed)
+                if (title) {
+                    queries.push(title);
+                }
             }
-            const data = await res.json();
-            if (data.items && data.items.length > 0) {
-                const info = data.items[0].volumeInfo;
-                return {
-                    found: true,
-                    title: info.title,
-                    author: info.authors ? info.authors.join('; ') : '',
-                    description: info.description,
-                    category: info.categories ? info.categories[0] : '',
-                    isbn: info.industryIdentifiers ? info.industryIdentifiers.find(i => i.type === 'ISBN_13')?.identifier || info.industryIdentifiers[0]?.identifier : '',
-                    publisher: info.publisher,
-                    year: info.publishedDate ? info.publishedDate.substring(0, 4) : '',
-                    language: info.language,
-                    pageCount: info.pageCount
-                };
+
+            console.log('Generated search queries strategies:', queries);
+
+            for (const q of queries) {
+                console.log(`Attempting search with query: ${q}`);
+                const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=1`);
+
+                if (!res.ok) {
+                    console.warn(`Google Books API failed for ${q}: ${res.status}`);
+                    continue;
+                }
+
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    console.log(`Found result for query: ${q}`);
+                    const info = data.items[0].volumeInfo;
+                    return {
+                        found: true,
+                        title: info.title,
+                        author: info.authors ? info.authors.join('; ') : '',
+                        description: info.description,
+                        category: info.categories ? info.categories[0] : '',
+                        isbn: info.industryIdentifiers ? info.industryIdentifiers.find(i => i.type === 'ISBN_13')?.identifier || info.industryIdentifiers[0]?.identifier : '',
+                        publisher: info.publisher,
+                        year: info.publishedDate ? info.publishedDate.substring(0, 4) : '',
+                        language: info.language,
+                        pageCount: info.pageCount
+                    };
+                }
             }
+
+            console.log('No results found after trying all strategies.');
             return { found: false };
+
         } catch (error) {
             console.error('Google Books error:', error);
-            // Return error object so frontend handles it (but if invoke throws, frontend catches)
-            // If we throw here, invoke throws in frontend.
-            // If we return object, frontend sees successful invoke with error property.
+            // Return error object so frontend handles it
             return { found: false, error: error.message };
         }
     });

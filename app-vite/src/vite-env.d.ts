@@ -9,7 +9,7 @@ interface Window {
         updateBook: (id: string, data: any) => Promise<{ success: boolean }>;
         deleteBook: (id: string) => Promise<{ success: boolean }>;
         checkHash: (hash: string) => Promise<{ exists: boolean; book?: any }>;
-        searchGoogle: (query: string) => Promise<{ found: boolean; title?: string; author?: string;[key: string]: any }>;
+        searchGoogle: (query: string | { isbn?: string; title?: string; author?: string; }) => Promise<{ found: boolean; title?: string; author?: string;[key: string]: any }>;
         uploadBook: (fileBuffer: ArrayBuffer, fileName: string, fileType: string) => Promise<{ success: boolean; id: string; folderPath: string; fileName: string }>;
         uploadCover: (bookId: string, fileBuffer: ArrayBuffer) => Promise<{ success: boolean }>;
         openExternal: (url: string) => void;
