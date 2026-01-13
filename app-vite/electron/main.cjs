@@ -284,9 +284,17 @@ app.whenReady().then(async () => {
     });
 
     autoUpdater.on('error', (err) => {
-        logToFile(`Update error: ${err.message}`);
+        const errorMsg = err.message || String(err);
+        logToFile(`Update error: ${errorMsg}`);
+
+        // Silently ignore missing config file (common in local builds)
+        if (errorMsg.includes('app-update.yml') && errorMsg.includes('ENOENT')) {
+            logToFile('Update check skipped: app-update.yml not found (Local build or non-released version)');
+            return;
+        }
+
         if (mainWindow) {
-            mainWindow.webContents.send('update:error', err.message);
+            mainWindow.webContents.send('update:error', errorMsg);
         }
     });
 
@@ -314,15 +322,19 @@ app.whenReady().then(async () => {
     });
 
     // Check for updates (Safe Check)
-    // We remove the strict fs.existsSync check to let electron-updater try its defaults
-    // and wait a bit for the window to be ready to receive events.
+    // We add a check for app-update.yml to avoid ENOENT errors in local non-released builds
     if (!isDev) {
         setTimeout(() => {
-            logToFile('Starting automatic update check...');
-            autoUpdater.checkForUpdates().catch(err => {
-                logToFile(`Auto check failed: ${err.message}`);
-            });
-        }, 5000); // 5 second delay to ensure UI is ready
+            const updateConfigPath = path.join(process.resourcesPath, 'app-update.yml');
+            if (fs.existsSync(updateConfigPath)) {
+                logToFile('Starting automatic update check...');
+                autoUpdater.checkForUpdates().catch(err => {
+                    logToFile(`Auto check failed: ${err.message}`);
+                });
+            } else {
+                logToFile('AutoUpdate skipped: app-update.yml missing (Normal for local builds)');
+            }
+        }, 8000); // 8 second delay to ensure UI is ready
     } else {
         logToFile('AutoUpdate skipped: Development mode');
     }
