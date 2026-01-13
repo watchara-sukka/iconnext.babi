@@ -248,6 +248,13 @@ app.whenReady().then(async () => {
     // Auto Update Setup
     autoUpdater.autoDownload = false; // Disable auto-download to handle manual choice
 
+    // Connect internal logger
+    autoUpdater.logger = {
+        info: (msg) => logToFile(`[Updater] ${msg}`),
+        warn: (msg) => logToFile(`[Updater Warn] ${msg}`),
+        error: (msg) => logToFile(`[Updater Error] ${msg}`)
+    };
+
     autoUpdater.on('checking-for-update', () => {
         logToFile('Checking for update...');
         if (mainWindow) mainWindow.webContents.send('update:checking');
@@ -311,7 +318,21 @@ app.whenReady().then(async () => {
 
     ipcMain.on('update:download', () => {
         logToFile('Update download requested via IPC');
-        autoUpdater.downloadUpdate();
+        // Add explicit catch for download start failures
+        try {
+            const downloadPromise = autoUpdater.downloadUpdate();
+            // Check if it returns a promise (it should)
+            if (downloadPromise && downloadPromise.catch) {
+                downloadPromise.catch(err => {
+                    logToFile(`Download start failed: ${err.message}`);
+                    if (mainWindow) {
+                        mainWindow.webContents.send('update:error', `Download start failed: ${err.message}`);
+                    }
+                });
+            }
+        } catch (e) {
+            logToFile(`Download sync error: ${e.message}`);
+        }
     });
 
     // --- SINGLE INSTANCE LOCK ---
