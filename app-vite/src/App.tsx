@@ -76,16 +76,20 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-indigo-500/30">
-      {/* Header */}
+      {/* Header - Standard height */}
       <div className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
-                <span className="text-2xl">📚</span>
+              <div className="flex items-center justify-center">
+                <img
+                  src={`/logo-no-bg.png?v=${new Date().getTime()}`}
+                  alt="Babi E-book Portal"
+                  className="h-12 w-auto object-contain drop-shadow-lg"
+                />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                Babi Portal
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent transform translate-y-0.5">
+                Babi E-book Portal
               </h1>
             </div>
 
