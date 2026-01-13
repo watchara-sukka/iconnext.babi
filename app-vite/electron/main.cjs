@@ -287,9 +287,14 @@ app.whenReady().then(async () => {
         const errorMsg = err.message || String(err);
         logToFile(`Update error: ${errorMsg}`);
 
-        // Silently ignore missing config file (common in local builds)
-        if (errorMsg.includes('app-update.yml') && errorMsg.includes('ENOENT')) {
-            logToFile('Update check skipped: app-update.yml not found (Local build or non-released version)');
+        // Silently ignore cases where no release is found or config is missing
+        if (
+            (errorMsg.includes('app-update.yml') && errorMsg.includes('ENOENT')) ||
+            errorMsg.includes('Unable to find latest version') ||
+            errorMsg.includes('406')
+        ) {
+            logToFile('Update check skipped: No production release found on GitHub yet.');
+            if (mainWindow) mainWindow.webContents.send('update:not-available');
             return;
         }
 
