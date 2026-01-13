@@ -117,7 +117,7 @@ export const setupMockApi = () => {
             await new Promise(resolve => setTimeout(resolve, 500));
             return { success: true };
         },
-        onUpdateChecking: (callback: () => void) => {
+        onUpdateChecking: (_callback: () => void) => {
             console.log('[Mock] onUpdateChecking registered');
             return () => { };
         },
@@ -129,19 +129,19 @@ export const setupMockApi = () => {
             }, 30000);
             return () => clearTimeout(timer);
         },
-        onUpdateNotAvailable: (callback: () => void) => {
+        onUpdateNotAvailable: (_callback: () => void) => {
             console.log('[Mock] onUpdateNotAvailable registered');
             return () => { };
         },
-        onUpdateProgress: (callback: (progress: any) => void) => {
+        onUpdateProgress: (_callback: (progress: any) => void) => {
             console.log('[Mock] onUpdateProgress registered');
             return () => { };
         },
-        onUpdateDownloaded: (callback: (info: any) => void) => {
+        onUpdateDownloaded: (_callback: (info: any) => void) => {
             console.log('[Mock] onUpdateDownloaded registered');
             return () => { };
         },
-        onUpdateError: (callback: (message: string) => void) => {
+        onUpdateError: (_callback: (message: string) => void) => {
             console.log('[Mock] onUpdateError registered');
             return () => { };
         },
