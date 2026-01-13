@@ -49,7 +49,12 @@ contextBridge.exposeInMainWorld('api', {
         ipcRenderer.on('update:error', listener);
         return () => ipcRenderer.removeListener('update:error', listener);
     },
+    checkForUpdates: () => ipcRenderer.send('update:check'),
     downloadUpdate: () => ipcRenderer.send('update:download'),
     quitAndInstall: () => ipcRenderer.send('update:quit-and-install'),
-    openReleasePage: () => ipcRenderer.send('update:open-release')
+    openReleasePage: () => ipcRenderer.send('update:open-release'),
+
+    // App Control
+    getInfo: () => ipcRenderer.invoke('app:getInfo'),
+    quitApp: () => ipcRenderer.send('app:quit')
 });

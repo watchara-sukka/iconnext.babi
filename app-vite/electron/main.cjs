@@ -230,6 +230,19 @@ app.whenReady().then(async () => {
     });
     handleDatabaseIpc(ipcMain);
 
+    // App Control IPC
+    ipcMain.handle('app:getInfo', () => {
+        return {
+            version: app.getVersion(),
+            platform: process.platform,
+            arch: process.arch
+        };
+    });
+
+    ipcMain.on('app:quit', () => {
+        app.quit();
+    });
+
     createWindow();
 
     // Auto Update Setup
@@ -249,6 +262,7 @@ app.whenReady().then(async () => {
 
     autoUpdater.on('update-not-available', (info) => {
         logToFile('Update not available.');
+        console.log('Update not available.');
         if (mainWindow) mainWindow.webContents.send('update:not-available');
     });
 
@@ -292,19 +306,25 @@ app.whenReady().then(async () => {
         autoUpdater.quitAndInstall();
     });
 
-    // Check for updates (Safe Check)
-    const updateConfigPath = process.platform === 'darwin'
-        ? path.join(process.resourcesPath, 'app-update.yml')
-        : path.join(process.resourcesPath, 'app-update.yml'); // Standard path
+    ipcMain.on('update:check', () => {
+        logToFile('Manual update check requested via IPC');
+        autoUpdater.checkForUpdates().catch(err => {
+            logToFile(`Manual check failed: ${err.message}`);
+        });
+    });
 
-    if (!isDev && fs.existsSync(updateConfigPath)) {
-        try {
-            autoUpdater.checkForUpdates();
-        } catch (e) {
-            logToFile(`Failed to start autoUpdater: ${e.message}`);
-        }
+    // Check for updates (Safe Check)
+    // We remove the strict fs.existsSync check to let electron-updater try its defaults
+    // and wait a bit for the window to be ready to receive events.
+    if (!isDev) {
+        setTimeout(() => {
+            logToFile('Starting automatic update check...');
+            autoUpdater.checkForUpdates().catch(err => {
+                logToFile(`Auto check failed: ${err.message}`);
+            });
+        }, 5000); // 5 second delay to ensure UI is ready
     } else {
-        logToFile('AutoUpdate skipped: Not packaged or app-update.yml missing');
+        logToFile('AutoUpdate skipped: Development mode');
     }
 
     app.on('activate', () => {

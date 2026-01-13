@@ -32,6 +32,6 @@ jobs:
       - name: Build and Publish
         run: |
           cd app-vite
-          npm run build:electron
+          npm run build:electron -- --publish always
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

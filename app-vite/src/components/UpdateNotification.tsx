@@ -9,7 +9,11 @@ export const UpdateNotification: React.FC = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        // Log for debugging
+        console.log('[UpdateNotification] Monitoring for updates...');
+
         const cleanup1 = window.api.onUpdateAvailable((info) => {
+            console.log('[UpdateNotification] Update available:', info);
             setVersion(info.version);
             setStatus('available');
         });
@@ -24,15 +28,22 @@ export const UpdateNotification: React.FC = () => {
         });
 
         const cleanup4 = window.api.onUpdateError((msg) => {
+            console.error('[UpdateNotification] Error:', msg);
             setError(msg);
             setStatus('error');
         });
+
+        // Small delay before checking to ensure all listeners are ready
+        const timer = setTimeout(() => {
+            window.api.checkForUpdates();
+        }, 3000);
 
         return () => {
             cleanup1();
             cleanup2();
             cleanup3();
             cleanup4();
+            clearTimeout(timer);
         };
     }, []);
 

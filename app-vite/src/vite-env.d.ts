@@ -19,8 +19,11 @@ interface Window {
         onUpdateProgress: (callback: (progress: any) => void) => () => void;
         onUpdateDownloaded: (callback: (info: any) => void) => () => void;
         onUpdateError: (callback: (message: string) => void) => () => void;
+        checkForUpdates: () => void;
         downloadUpdate: () => void;
         quitAndInstall: () => void;
         openReleasePage: () => void;
+        getInfo: () => Promise<{ version: string; platform: string; arch: string }>;
+        quitApp: () => void;
     }
 }

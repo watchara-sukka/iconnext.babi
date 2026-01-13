@@ -1,9 +1,10 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { LayoutGrid, List, Search, Layers, Bell, Settings, Plus } from 'lucide-react';
+import { LayoutGrid, List, Search, Layers, Bell, Settings, Plus, Info, X } from 'lucide-react';
 // import BookList from './components/BookList';
 const UploadModal = lazy(() => import('./components/UploadModal'));
 const BookDetailModal = lazy(() => import('./components/BookDetailModal'));
 import { UpdateNotification } from './components/UpdateNotification';
+import { VersionModal } from './components/VersionModal';
 
 // Type definition for Book is duplicated/shared
 interface Book {
@@ -36,6 +37,8 @@ function App() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBooks, setTotalBooks] = useState(0);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showVersionModal, setShowVersionModal] = useState(false);
   const itemsPerPage = 50;
 
   const fetchBooks = async () => {
@@ -91,9 +94,51 @@ function App() {
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-indigo-500 rounded-full border-2 border-slate-900 group-hover:border-slate-800"></span>
               </button>
-              <button className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
-                <Settings className="w-5 h-5" />
-              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                  className={`p-2.5 rounded-xl transition-all ${showSettingsMenu ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+
+                {showSettingsMenu && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowSettingsMenu(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <button
+                        className="w-full text-left px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-3 transition-colors"
+                        onClick={() => setShowSettingsMenu(false)}
+                      >
+                        <Settings size={16} />
+                        การตั้งค่า
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-3 transition-colors"
+                        onClick={() => {
+                          setShowSettingsMenu(false);
+                          setShowVersionModal(true);
+                        }}
+                      >
+                        <Info size={16} />
+                        ซอฟท์แวร์เวอร์ชั่น
+                      </button>
+                      <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1 mx-2" />
+                      <button
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors font-medium"
+                        onClick={() => window.api.quitApp()}
+                      >
+                        <X size={16} />
+                        ปิดโปรแกรม
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -294,6 +339,9 @@ function App() {
 
       {/* Logic-based UI Elements */}
       <UpdateNotification />
+      {showVersionModal && (
+        <VersionModal onClose={() => setShowVersionModal(false)} />
+      )}
     </div>
   );
 }

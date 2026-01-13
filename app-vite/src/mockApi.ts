@@ -145,6 +145,9 @@ export const setupMockApi = () => {
             console.log('[Mock] onUpdateError registered');
             return () => { };
         },
+        checkForUpdates: () => {
+            console.log('[Mock] checkForUpdates');
+        },
         downloadUpdate: () => {
             console.log('[Mock] downloadUpdate');
         },
@@ -158,6 +161,13 @@ export const setupMockApi = () => {
         openExternal: (url: string) => {
             console.log('[Mock] openExternal', url);
             window.open(url, '_blank');
+        },
+        getInfo: async () => {
+            return { version: '0.6.0-mock', platform: 'browser', arch: 'x64' };
+        },
+        quitApp: () => {
+            console.log('[Mock] quitApp');
+            window.close();
         }
     };
 };
