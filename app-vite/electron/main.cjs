@@ -314,16 +314,21 @@ app.whenReady().then(async () => {
         autoUpdater.downloadUpdate();
     });
 
-    ipcMain.on('update:quit-and-install', () => {
-        logToFile('Quit and install requested via IPC');
-        autoUpdater.quitAndInstall();
-    });
+    // --- SINGLE INSTANCE LOCK ---
+    const gotTheLock = app.requestSingleInstanceLock();
+    if (!gotTheLock) {
+        logToFile('App instance already running. Quitting this instance.');
+        app.quit();
+        return; // Stop further execution
+    }
 
-    ipcMain.on('update:check', () => {
-        logToFile('Manual update check requested via IPC');
-        autoUpdater.checkForUpdates().catch(err => {
-            logToFile(`Manual check failed: ${err.message}`);
-        });
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (mainWindow) {
+            logToFile('Second instance started, focusing main window.');
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
     });
 
     // Check for updates (Safe Check)
@@ -349,6 +354,14 @@ app.whenReady().then(async () => {
             createWindow();
         }
     });
+});
+
+ipcMain.on('update:quit-and-install', () => {
+    logToFile('Quit and install requested via IPC');
+    // Ensure we force run the install
+    // isSilent: false ensures the installer UI (if any) or restart happens visibly
+    // forceRunAfter: true ensures app restarts
+    autoUpdater.quitAndInstall(false, true);
 });
 
 // Final cleanup and save before quit

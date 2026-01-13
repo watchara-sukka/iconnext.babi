@@ -1,7 +1,7 @@
 {
   "name": "babi-ebook-portal",
   "private": true,
-  "version": "0.6.9",
+  "version": "0.6.10",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "Portable E-book Manager",
