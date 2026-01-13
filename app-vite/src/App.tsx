@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { LayoutGrid, List, Search, Layers, Bell, Settings, Plus, Info, X } from 'lucide-react';
 // import BookList from './components/BookList';
+import logoNoBg from '/logo-no-bg.png'; // Use absolute public path for Vite behavior
 const UploadModal = lazy(() => import('./components/UploadModal'));
 const BookDetailModal = lazy(() => import('./components/BookDetailModal'));
 import { UpdateNotification } from './components/UpdateNotification';
@@ -83,7 +84,7 @@ function App() {
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">
                 <img
-                  src={`/logo-no-bg.png?v=${new Date().getTime()}`}
+                  src={logoNoBg}
                   alt="Babi E-book Portal"
                   className="h-12 w-auto object-contain drop-shadow-lg"
                 />
