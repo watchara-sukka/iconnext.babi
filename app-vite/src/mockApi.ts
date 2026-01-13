@@ -76,21 +76,29 @@ export const setupMockApi = () => {
             }
             return { exists: false };
         },
-        searchGoogle: async (query: string) => {
-            console.log('[Mock] searchGoogle', query);
+        searchGoogle: async (queryInput: string | { isbn?: string; title?: string; author?: string; }) => {
+            console.log('[Mock] searchGoogle', queryInput);
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
 
-            if (query.toLowerCase().includes('error')) {
+            // Determine query string for mock logic
+            let queryStr = '';
+            if (typeof queryInput === 'string') {
+                queryStr = queryInput;
+            } else {
+                queryStr = queryInput.isbn || queryInput.title || '';
+            }
+
+            if (queryStr.toLowerCase().includes('error')) {
                 throw new Error('Simulated Google API Error');
             }
 
-            if (query.toLowerCase().includes('notfound')) {
+            if (queryStr.toLowerCase().includes('notfound')) {
                 return { found: false };
             }
 
             return {
                 found: true,
-                title: 'Mock Book: ' + query,
+                title: 'Mock Book: ' + (typeof queryInput === 'string' ? queryInput : (queryInput.title || queryInput.isbn)),
                 author: 'John Doe',
                 description: 'This is a mocked book description from the browser environment.',
                 isbn: '978-0123456789',
