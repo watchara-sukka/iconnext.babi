@@ -1,4 +1,4 @@
-<img src="./docs/logo-full.png" alt="APP LOGO" width="100px" />  # Babi E-book Portal
+#<img src="./docs/logo-full.png" alt="APP LOGO" width="100px" /> Babi E-book Portal
 
 # Babi Portable E-Book Portal
 
@@ -48,10 +48,13 @@ The system is designed for **portability** and **isolation**.
 - [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 ### ขั้นตอนการติดตั้ง project
-1.  Clone this repository.
-2.  Open the folder in VS Code.
-3.  Click **"Reopen in Container"** when prompted (or use `F1` > `Dev Containers: Reopen in Container`).
-4.  Wait for the initialization to finish. All dependencies will be installed automatically.
+1.  โคลนrepository ผ่านคำสั่ง
+```bash
+ `git clone https://github.com/watchara-sukka/iconnext.babi.git`.
+ ```
+2.  เปิดโฟลเดอร์ใน VS Code.
+3.  คลิก  **"Reopen in Container"** เมื่อขึนข้อความ (หรือกด `F1` > `Dev Containers: Reopen in Container`).
+4.  รอจนกว่าจะเริ่มสรา้ง devcontain สำเร็จโดยจะทำการติดตั้งสิ่งที่จำเป็นทั้งหมดโดยอัติโนมัติ.
 
 ### โครงสร้างproject
 ```
@@ -91,34 +94,22 @@ The SQLite database file is located at `./data/library.db` (gitignored).
 
 ในกระบวนการติดตั้งเราใช้ **GitHub Actions**  The pipeline is triggered by **Git Tags**.
 
-![CI/CD Architecture](./docs/pipeline.png)
+![CI/CD Architecture](./docs/pipe-line.png)
 
-### Release Process
-To release a new version (Windows .exe & macOS .dmg), follow these steps:
+### การบวนการปล่อยโปรแกรม
+ในการสรา้งโปรแกรมเวอร์ชั่นใหม่ (Windows .exe & macOS .dmg), ให้ดำเนอนการตามนี้:
 
-1.  **Commit & Push** your changes to `main`.
-2.  **Create a Tag:** The tag must follow semantic versioning (e.g., `v1.0.0`).
+1.  **Commit & Push** การเปลี่ยนแปลงของ code ไปยัง `main`.
+2.  **Create a Tag:** สรา้ง tag ตามรูปแบบ semantic version (e.g., `v1.0.0`)ผ่านคำสั่ง. 
     ```bash
     git tag v1.0.0
     git push origin v1.0.0
     ```
-3.  **Watch the Action:**
-    * The workflow will trigger automatically.
-    * It spins up parallel jobs for **Windows** and **macOS**.
-    * Once built, artifacts are uploaded to **GitHub Releases**.
+3.  **ตรวจสอบวการทำงาน Github Action:**
+    * workflow จะถูกสรา้งโดยอัตโนมัติ.
+    * มันจะแบ่งงานในการสรา้ง **Windows** and **macOS** แอพขนานกันไป.
+    * หลักจากทำงานสำเร็จแอพจะถูกสรา้งไปไว้ที่**GitHub Releases(https://github.com/watchara-sukka/iconnext.babi/releases)**.
 
-### CI/CD Architecture
- 
-```mermaid
-graph LR
-    A[Push Tag v*] --> B(GitHub Actions)
-    B --> C{Matrix Build}
-    C -->|Windows-latest| D[Build .exe]
-    C -->|macOS-latest| E[Build .dmg]
-    D --> F[Draft Release]
-    E --> F
-
-## 📦 Build & Deploy to USB - Complete Process
 
 ![USB Deployment Process](docs/usb-deployment-process.png)
 
