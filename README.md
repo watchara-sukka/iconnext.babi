@@ -13,9 +13,11 @@
 
 
 โดยพัฒนาผ่าน **Electron**, **React**, **Vite**, and **Tailwind CSS**.
+
 ![Project Overview](./docs/project%20overview.jpg)
 
 **จุดเด่น**: 
+
     - **Fast Startup**: ปรับปรุงความเร็วในการเปิดโปรแกรมโดยการเปลี่ยนจาก Next.js มาเป็น Vite
     - **True Portability**: จัดเตรียมข้อมูล (Database/Uploads) ไว้ข้างตัวแอปบน USB ได้โดยตรง
     - **No Port Conflicts**: ไม่ต้องรัน Local Server (Node.js) ในพื้นหลัง ทำให้ไม่มีปัญหาเรื่องพอร์ตถูกใช้งานซ้ำ
