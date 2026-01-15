@@ -1,4 +1,4 @@
-![App Logo](./docs/app-logo.png)# Babi E-book Portal
+![App Logo](./docs/logo-full.png) # Babi E-book Portal
 
 # Babi Portable E-Book Portal
 
@@ -11,8 +11,10 @@
 
 **Babi Portable E-Book Portal** เป็น Portable Application(สำหรับ Windows/Mac) ในการบริหารจัดการ e-book โดยทำงานบน Removavle Storage 
 
+
 โดยพัฒนาผ่าน **Electron**, **React**, **Vite**, and **Tailwind CSS**.
 ![Project Overview](./docs/project%20overview.jpg)
+
 **จุดเด่น**: 
     - **Fast Startup**: ปรับปรุงความเร็วในการเปิดโปรแกรมโดยการเปลี่ยนจาก Next.js มาเป็น Vite
     - **True Portability**: จัดเตรียมข้อมูล (Database/Uploads) ไว้ข้างตัวแอปบน USB ได้โดยตรง
