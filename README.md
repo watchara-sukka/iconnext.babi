@@ -9,10 +9,14 @@
 
 ## ภาพรวม
 
-**Babi Portable E-Book Portal** เป็น Portable Application สำหรับบริหารจัดการ e-book โดยทำงานบน Removavle Storage 
+**Babi Portable E-Book Portal** เป็น Portable Application(สำหรับ Windows/Mac) ในการบริหารจัดการ e-book โดยทำงานบน Removavle Storage 
 
 โดยพัฒนาผ่าน **Electron**, **React**, **Vite**, and **Tailwind CSS**.
 ![Project Overview](./docs/project%20overview.jpg)
+**จุดเด่น**: 
+    - **Fast Startup**: ปรับปรุงความเร็วในการเปิดโปรแกรมโดยการเปลี่ยนจาก Next.js มาเป็น Vite
+    - **True Portability**: จัดเตรียมข้อมูล (Database/Uploads) ไว้ข้างตัวแอปบน USB ได้โดยตรง
+    - **No Port Conflicts**: ไม่ต้องรัน Local Server (Node.js) ในพื้นหลัง ทำให้ไม่มีปัญหาเรื่องพอร์ตถูกใช้งานซ้ำ
 ---
 
 ## สถาปัตยกรรมระบบ
@@ -25,7 +29,7 @@ The system is designed for **portability** and **isolation**.
 ### Tech Stack
 * **Runtime:** Electron (Main Process)
 * **Frontend:** React + Vite + Tailwind CSS (Renderer Process)
-* **Database:** SQLite (โดยใช้ `better-sqlite3` or similar)
+* **Database:** SQLite (โดยใช้ `sqljs`สำหรับ Browser environment ใน Electron)
 * **Storage:** เก็บข้อมูลผบน removable storage (Relative path to the executable)
 * **Language:** TypeScript / JavaScript
 
@@ -38,14 +42,15 @@ The system is designed for **portability** and **isolation**.
 ### Prerequisites
 1.  [Docker Desktop](https://www.docker.com/products/docker-desktop)
 2.  [Visual Studio Code](https://code.visualstudio.com/)
-3.  [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-### Setup Steps
+### ขั้นตอนการติดตั้ง project
 1.  Clone this repository.
 2.  Open the folder in VS Code.
 3.  Click **"Reopen in Container"** when prompted (or use `F1` > `Dev Containers: Reopen in Container`).
 4.  Wait for the initialization to finish. All dependencies will be installed automatically.
 
+### โครงสร้างของโฟลเดอร์ใน project
 ---
 
 ## 💻 Development Workflow (Inner Loop)
@@ -85,6 +90,7 @@ To release a new version (Windows .exe & macOS .dmg), follow these steps:
     * Once built, artifacts are uploaded to **GitHub Releases**.
 
 ### CI/CD Architecture
+(CI/CD Architecture)[./docs/ci-cd-architecture.png] 
 ```mermaid
 graph LR
     A[Push Tag v*] --> B(GitHub Actions)
