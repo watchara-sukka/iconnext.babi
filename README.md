@@ -1,5 +1,6 @@
 
-#<img src="./docs/logo-full.png" alt="APP LOGO" width="100px" /> Babi Portable E-Book Portal
+<img src="./docs/logo-full.png" alt="APP LOGO" width="100px" /> 
+#Babi Portable E-Book Portal
 
 ![CI/CD Status](https://img.shields.io/github/actions/workflow/status/[user]/[repo]/main.yml?style=flat-square)
 ![Release](https://img.shields.io/github/v/release/[user]/[repo]?style=flat-square)
@@ -107,7 +108,7 @@ The SQLite database file is located at `./data/library.db` (gitignored).
 3.  **ตรวจสอบวการทำงาน Github Action:**
     * workflow จะถูกสรา้งโดยอัตโนมัติ.
     * มันจะแบ่งงานในการสรา้ง **Windows** and **macOS** แอพขนานกันไป.
-    * หลักจากทำงานสำเร็จแอพจะถูกสรา้งไปไว้ที่**![GitHub Releases](https://github.com/watchara-sukka/iconnext.babi/releases)**.
+    * หลักจากทำงานสำเร็จแอพจะถูกสรา้งไปไว้ที่**[GitHub Releases](https://github.com/watchara-sukka/iconnext.babi/releases)**.
 
 
 ### โครงสร้างไดเรกทอรี (USB Version - Deployment)
