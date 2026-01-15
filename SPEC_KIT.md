@@ -22,6 +22,13 @@
 - **Portability**: ออกแบบมาให้มีทุกอย่างครบจบในโฟลเดอร์เดียว (Self-contained) รองรับฟังก์ชัน "Plug & Play" บน USB drive
 - **Data Persistence**: เก็บฐานข้อมูลและไฟล์แนบไว้ในโฟลเดอร์ `data` และ `uploads` ที่อยู่ระดับเดียวกันกับตัวแอปพลิเคชัน (Portable Mode)
 
+### 2.3 ประสิทธิภาพและการปรับแต่ง (Performance & Optimizations)
+เพื่อให้แอปพลิเคชันสามารถทำงานได้อย่างรวดเร็วบนอุปกรณ์ USB (ซึ่งมียังมีข้อจำกัดด้านความเร็วในการอ่านเขียน) ระบบได้มีการปรับแต่งดังนี้:
+1.  **Vite Migration**: เปลี่ยนจาก Next.js มาใช้ Vite เพื่อลด Overhead ของ Server-side rendering ทำให้เปิดโปรแกรมได้ทันที (Instant Startup) โดยไม่ต้องรอ Node.js Server บูท
+2.  **ASAR Packaging**: รวมไฟล์กว่าหมื่นไฟล์ให้เป็นไฟล์เดียว (`app.asar`) ช่วยแก้ปัญหาคอขวดของระบบไฟล์ (File System Overhead) บน USB ทำให้ Copy ลง Flash Drive ได้เร็วกว่าเดิม 10-20 เท่า
+3.  **Symlink Dereferencing**: ใช้กระบวนการ copy แบบพิเศษ (`rsync -L`) สำหรับ macOS เพื่อแปลง Symbolic Links ให้เป็นไฟล์จริง ป้องกันปัญหาไฟล์เสียเมื่อนำไปรันบน Windows หรือ File System เก่า (ExFAT/FAT32)
+4.  **Mac Optimization Flags**: ปิดฟีเจอร์ที่ไม่จำเป็นสำหรับ Portable App (`no-sandbox`, `disable-gpu`) เพื่อลดการกินทรัพยากรและป้องกันการแครชเมื่อรันผ่าน USB
+
 ## 3. สถาปัตยกรรมระบบ
 
 ### 3.1 โครงสร้างไดเรกทอรี (สำหรับนักพัฒนา)
