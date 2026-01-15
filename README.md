@@ -1,4 +1,4 @@
-<img src="./docs/logo-full.png" alt="APP LOGO" width="50px" /> # Babi E-book Portal
+<img src="./docs/logo-full.png" alt="APP LOGO" width="100px" />  # Babi E-book Portal
 
 # Babi Portable E-Book Portal
 
@@ -28,7 +28,6 @@
 The system is designed for **portability** and **isolation**.
 
 ![Architecture Diagram](./docs/app-architecture.png)
-*(Note: Place your architecture infographic here)*
 
 ### Tech Stack
 * **Runtime:** Electron (Main Process)
@@ -90,7 +89,9 @@ The SQLite database file is located at `./data/library.db` (gitignored).
 
 ## ⚙️ CI/CD Pipeline (Outer Loop)
 
-We utilize **GitHub Actions** for automated building and releasing. The pipeline is triggered by **Git Tags**.
+ในกระบวนการติดตั้งเราใช้ **GitHub Actions**  The pipeline is triggered by **Git Tags**.
+
+![CI/CD Architecture](./docs/pipeline.png)
 
 ### Release Process
 To release a new version (Windows .exe & macOS .dmg), follow these steps:
@@ -107,7 +108,7 @@ To release a new version (Windows .exe & macOS .dmg), follow these steps:
     * Once built, artifacts are uploaded to **GitHub Releases**.
 
 ### CI/CD Architecture
-![CI/CD Architecture](./docs/pipeline.png) 
+ 
 ```mermaid
 graph LR
     A[Push Tag v*] --> B(GitHub Actions)
