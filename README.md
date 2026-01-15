@@ -78,10 +78,10 @@ The system is designed for **portability** and **isolation**.
 
 | Task | Command | Description |
 | :--- | :--- | :--- |
-| **Start Dev Server** | `npm run dev` | Starts Vite and Electron in watch mode with Hot Reload. |
-| **Lint Code** | `npm run lint` | Checks for code style issues using ESLint. |
-| **Run Tests** | `npm run test` | Runs unit tests (Vitest/Jest). |
-| **Build Local** | `npm run build` | Builds the production package for the current OS (inside container). |
+| **Start Dev Server** | `dev:electron` | ทำงาน Vite and Electron in watch mode with Hot Reload.(แสดงหน้าจอโปรแกรมผ่าน webbrowser) |
+| **Lint Code** | `npm run lint` | ตรวจสอบรูปแบบการเขียนโค้ดผ่าน ESLint. |
+| **Build Local(Win)** | `npm run build:win` | สรา้ง  package สำหรับ Windows(.exe). |
+| **Build Local(MacOS)** | `npm run build:mac` | สรา้ง  package สำหรับ MacOS(.app) |
 
 ### Database Management
 The SQLite database file is located at `./data/library.db` (gitignored).
