@@ -52,7 +52,20 @@ The system is designed for **portability** and **isolation**.
 3.  Click **"Reopen in Container"** when prompted (or use `F1` > `Dev Containers: Reopen in Container`).
 4.  Wait for the initialization to finish. All dependencies will be installed automatically.
 
-### โครงสร้างของโฟลเดอร์ใน project
+### โครงสร้างproject
+```
+/workspaces/iconnext.babi/
+├── app-vite/             # แอปพลิเคชัน Electron + Vite (Source Code ปัจจุบัน)
+│   ├── src/              # React Frontend
+│   ├── electron/         # Electron Main/Preload scripts
+│   ├── public/           # Assets
+│   └── package.json
+├── data/                 # ฐานข้อมูล SQLite (Shared)
+├── uploads/              # โฟลเดอร์เก็บไฟล์หนังสือ (Shared)
+├── scripts/              # สคริปต์สำหรับช่วย Build และ Sync ลง USB
+└── README.md
+```
+
 ---
 
 ## 💻 Development Workflow (Inner Loop)
@@ -177,7 +190,7 @@ npm run dev
 เปิด [http://localhost:3000](http://localhost:3000) ในเบราว์เซอร์เพื่อดูผลลัพธ์
 
 ## โครงสร้างโปรเจกต์
-
+```
 /workspaces/iconnext.babi/
 ├── app-vite/             # แอปพลิเคชัน Electron + Vite (Source Code ปัจจุบัน)
 │   ├── src/              # React Frontend
