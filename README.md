@@ -1,4 +1,4 @@
-# Babi E-book Portal
+![App Logo](./docs/app-logo.png)# Babi E-book Portal
 
 # Babi Portable E-Book Portal
 
