@@ -1,4 +1,4 @@
-![App Logo](./docs/logo-full.png) # Babi E-book Portal
+<img src="./docs/logo-full.png" alt="APP LOGO" width="50px" /> # Babi E-book Portal
 
 # Babi Portable E-Book Portal
 
