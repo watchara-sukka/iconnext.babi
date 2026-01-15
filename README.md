@@ -1,5 +1,99 @@
 # Babi E-book Portal
 
+# Babi Portable E-Book Portal
+
+![CI/CD Status](https://img.shields.io/github/actions/workflow/status/[user]/[repo]/main.yml?style=flat-square)
+![Release](https://img.shields.io/github/v/release/[user]/[repo]?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey?style=flat-square)
+
+## ภาพรวม
+
+**Babi Portable E-Book Portal** เป็น Portable Application สำหรับบริหารจัดการ e-book โดยทำงานบน Removavle Storage 
+
+โดยพัฒนาผ่าน **Electron**, **React**, **Vite**, and **Tailwind CSS**.
+![Project Overview](./docs/project%20overview.jpg)
+---
+
+## สถาปัตยกรรมระบบ
+
+The system is designed for **portability** and **isolation**.
+
+![Architecture Diagram](./docs/app-architecture.png)
+*(Note: Place your architecture infographic here)*
+
+### Tech Stack
+* **Runtime:** Electron (Main Process)
+* **Frontend:** React + Vite + Tailwind CSS (Renderer Process)
+* **Database:** SQLite (โดยใช้ `better-sqlite3` or similar)
+* **Storage:** เก็บข้อมูลผบน removable storage (Relative path to the executable)
+* **Language:** TypeScript / JavaScript
+
+---
+
+## 🚀 Getting Started (The Golden Path)
+
+ We use **Dev Containers** to ensure a consistent development environment for all engineers. You do not need to install Node.js or other dependencies locally.
+
+### Prerequisites
+1.  [Docker Desktop](https://www.docker.com/products/docker-desktop)
+2.  [Visual Studio Code](https://code.visualstudio.com/)
+3.  [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+### Setup Steps
+1.  Clone this repository.
+2.  Open the folder in VS Code.
+3.  Click **"Reopen in Container"** when prompted (or use `F1` > `Dev Containers: Reopen in Container`).
+4.  Wait for the initialization to finish. All dependencies will be installed automatically.
+
+---
+
+## 💻 Development Workflow (Inner Loop)
+
+Once inside the Dev Container, you can use the standard terminal commands:
+
+| Task | Command | Description |
+| :--- | :--- | :--- |
+| **Start Dev Server** | `npm run dev` | Starts Vite and Electron in watch mode with Hot Reload. |
+| **Lint Code** | `npm run lint` | Checks for code style issues using ESLint. |
+| **Run Tests** | `npm run test` | Runs unit tests (Vitest/Jest). |
+| **Build Local** | `npm run build` | Builds the production package for the current OS (inside container). |
+
+### Database Management
+The SQLite database file is located at `./data/library.db` (gitignored).
+* To reset the DB: `npm run db:reset`
+* To seed mock data: `npm run db:seed`
+
+---
+
+## ⚙️ CI/CD Pipeline (Outer Loop)
+
+We utilize **GitHub Actions** for automated building and releasing. The pipeline is triggered by **Git Tags**.
+
+### Release Process
+To release a new version (Windows .exe & macOS .dmg), follow these steps:
+
+1.  **Commit & Push** your changes to `main`.
+2.  **Create a Tag:** The tag must follow semantic versioning (e.g., `v1.0.0`).
+    ```bash
+    git tag v1.0.0
+    git push origin v1.0.0
+    ```
+3.  **Watch the Action:**
+    * The workflow will trigger automatically.
+    * It spins up parallel jobs for **Windows** and **macOS**.
+    * Once built, artifacts are uploaded to **GitHub Releases**.
+
+### CI/CD Architecture
+```mermaid
+graph LR
+    A[Push Tag v*] --> B(GitHub Actions)
+    B --> C{Matrix Build}
+    C -->|Windows-latest| D[Build .exe]
+    C -->|macOS-latest| E[Build .dmg]
+    D --> F[Draft Release]
+    E --> F
+
 ## 📦 Build & Deploy to USB - Complete Process
 
 ![USB Deployment Process](docs/usb-deployment-process.png)
@@ -44,7 +138,7 @@ Babi E-book Portal คือระบบจัดการห้องสมุ�
 - [x]สร้าง hash file หนังสือบางเล่มในฐานข้อมูลไม่มี hash file มาก่อนให้สรา้งปุ่มใต้หน้าปกหนังสือในกรณีไม่พบค่า hash file ของหนังสือเล่นนั้นเมื่อกดจะหาค่า hashfile  และบันทึกลงในฐานข้อมูลทันที และถ้ามีค่า hash file ของ ebook อยู่แล้วให้แสดงค่าแทนปุ่ม(อ้างอิงจากป้องกันการอัพโหลดไฟล์หนังสือซ้ำได้)
 - [x] เพิ่มไอคอนช่วยเหลือ(?) อธิบายส่วนต่างๆ ของโปรแกรมว่าทำอะไร
 - [x] ปรับจากการเปิดหน้า web browser โดย nodejs ไปยัง Cross Platform Framework เช่น **Electron** แทน (รองรับ Single Executable File)
-- [x] เพิ่มแนวทางการ update program ผ่านการใช้ git push code ล่าสุดมา build 
+- [x] เพิ่มแนวทางการ update program ผ่านการใช้ git tag, git้ัิhub action, github release เพื่อ 
 - [x] ปรับปรุงการติดตั้งโปรแกรมครั้งแรกมี ความช้ามากๆ เนื่องจากใช้ nextjs ใช้เวลาในcopy node_module นานมาก
 ## การเริ่มต้นใช้งาน
 

@@ -23,5 +23,5 @@
 	"forwardPorts": [
 		3000
 	],
-	"postCreateCommand": "echo 'Container ready.'"
+	"postCreateCommand": "cd app-vite && npm install && echo 'Dependencies installed. Ready to code!'"
 }

@@ -122,6 +122,25 @@ fi
 rm -rf "$STAGING_DIR/Mac/data"
 rm -rf "$STAGING_DIR/Mac/uploads"
 
+# 4. Create Launcher Scripts
+echo "Creating launcher scripts..."
+
+# START_WINDOWS.bat
+cat > "$STAGING_DIR/START_WINDOWS.bat" <<EOF
+@echo off
+start "" "Windows\\Babi E-book Portal.exe"
+EOF
+
+# START_MAC.command
+cat > "$STAGING_DIR/START_MAC.command" <<EOF
+#!/bin/bash
+DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+open "\$DIR/Mac/Babi E-book Portal.app"
+EOF
+
+# Make Mac script executable
+chmod +x "$STAGING_DIR/START_MAC.command"
+
 # 5. Create Zip
 echo "Zipping package (using fast compression)..."
 cd "$STAGING_DIR"
