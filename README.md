@@ -90,7 +90,7 @@ To release a new version (Windows .exe & macOS .dmg), follow these steps:
     * Once built, artifacts are uploaded to **GitHub Releases**.
 
 ### CI/CD Architecture
-(CI/CD Architecture)[./docs/pipeline.png] 
+![CI/CD Architecture](./docs/pipeline.png) 
 ```mermaid
 graph LR
     A[Push Tag v*] --> B(GitHub Actions)
